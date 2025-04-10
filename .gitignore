@@ -1,0 +1,26 @@
+# Arquivos de build
+**/build/
+.cxx/
+.externalNativeBuild/
+
+# Configurações locais
+local.properties
+.gradle/
+
+# Android Studio
+.idea/
+*.iml
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Arquivos do sistema
+.DS_Store
+
+# Capturas de tela e arquivos temporários
+captures/
+*.log
+*.tmp
