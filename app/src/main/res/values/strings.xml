@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">AppBuscaViaCep</string>
+    <string name="logradouro">Logradouro: %1$s</string>
+    <string name="bairro">Bairro: %1$s</string>
+    <string name="cidade">Cidade: %1$s</string>
+    <string name="estado">Estado: %1$s</string>
+    <string name="invalido">Não encontrado</string>
 </resources>
