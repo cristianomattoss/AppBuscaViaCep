@@ -29,7 +29,7 @@ class DadosCepDAO(context: Context) {
 
         val listaCepsPesquisados = mutableListOf<CepPesquisado>()
 
-        val sql = "SELECT * FROM ${DataBaseHelper.TABELAS_DADOS_CEP}"
+        val sql = "SELECT * FROM ${DataBaseHelper.TABELAS_DADOS_CEP} ORDER BY rowid DESC"
         val cursor = leitura.rawQuery(sql, null)
 
         val indiceCep = cursor.getColumnIndex(DataBaseHelper.CEP)
@@ -39,21 +39,18 @@ class DadosCepDAO(context: Context) {
         val indiceEstado = cursor.getColumnIndex(DataBaseHelper.ESTADO)
 
         while (cursor.moveToNext()) {
-
-            val cep = cursor.getString(indiceCep)
-            val logradouro = cursor.getString(indiceLogradouro)
-            val bairro = cursor.getString(indiceBairro)
-            val cidade = cursor.getString(indiceCidade)
-            val estado = cursor.getString(indiceEstado)
-
-            listaCepsPesquisados.add(CepPesquisado(cep, logradouro, bairro, cidade, estado))
+            listaCepsPesquisados.add(
+                CepPesquisado(
+                    cursor.getString(indiceCep),
+                    cursor.getString(indiceLogradouro),
+                    cursor.getString(indiceBairro),
+                    cursor.getString(indiceCidade),
+                    cursor.getString(indiceEstado)
+                )
+            )
 
         }
 
         return listaCepsPesquisados
-    }
-
-    fun limparTabela() {
-        escrita.delete(DataBaseHelper.TABELAS_DADOS_CEP, null, null)
     }
 }

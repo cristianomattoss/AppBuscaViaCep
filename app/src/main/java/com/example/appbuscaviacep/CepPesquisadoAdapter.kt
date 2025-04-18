@@ -11,9 +11,21 @@ class CepPesquisadoAdapter : RecyclerView.Adapter<CepPesquisadoAdapter.CepViewHo
 
     private var listaCeps = mutableListOf<CepPesquisado>()
 
-    fun salvarLista(lista: MutableList<CepPesquisado>) {
+    fun carregarLista(lista: MutableList<CepPesquisado>) {
         listaCeps = lista
         notifyDataSetChanged()
+    }
+
+    fun adicionarPesquisa(cepPesquisado: CepPesquisado) {
+        if(listaCeps.size == 10) {
+            listaCeps.removeAt(listaCeps.size - 1)
+            notifyItemRemoved(listaCeps.size)
+            listaCeps.add(0, cepPesquisado)
+            notifyItemInserted(0)
+        } else {
+            listaCeps.add(0, cepPesquisado)
+            notifyItemInserted(0)
+        }
     }
 
     inner class CepViewHolder (

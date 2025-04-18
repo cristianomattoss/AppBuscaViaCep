@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         binding.rvCep.adapter = cepPesquisadoAdapter
         binding.rvCep.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         val dadosCepDAO = DadosCepDAO(this)
-        val listaCepsPesquisadosAtualizada = dadosCepDAO.listar()
-        cepPesquisadoAdapter.salvarLista(listaCepsPesquisadosAtualizada)
+        val listaCepsPesquisados = dadosCepDAO.listar()
+        cepPesquisadoAdapter.carregarLista(listaCepsPesquisados)
 
 
         binding.buscarButton.setOnClickListener {
@@ -131,26 +131,8 @@ class MainActivity : AppCompatActivity() {
     private fun atualizarHistorico(cepPesquisado: CepPesquisado) {
 
         val dadosCepDAO = DadosCepDAO(this@MainActivity)
-        val listaCepsPesquisados = dadosCepDAO.listar()
+        dadosCepDAO.salvar(cepPesquisado)
+        cepPesquisadoAdapter.adicionarPesquisa(cepPesquisado)
 
-        if(listaCepsPesquisados.size == 10){
-            listaCepsPesquisados.removeAt(9)
-            listarCeps(listaCepsPesquisados, cepPesquisado, dadosCepDAO)
-        } else {
-            listarCeps(listaCepsPesquisados, cepPesquisado, dadosCepDAO)
-        }
-
-    }
-
-    private fun listarCeps(listaCepsPesquisados: MutableList<CepPesquisado>, cepPesquisado: CepPesquisado, dadosCepDAO: DadosCepDAO) {
-
-        listaCepsPesquisados.add(0, cepPesquisado)
-        dadosCepDAO.limparTabela()
-
-        listaCepsPesquisados.forEach { pesquisa ->
-            dadosCepDAO.salvar(pesquisa)
-        }
-        val listaCepsPesquisadosAtualizada = dadosCepDAO.listar()
-        cepPesquisadoAdapter.salvarLista(listaCepsPesquisadosAtualizada)
     }
 }
