@@ -3,9 +3,14 @@ package com.example.appbuscaviacep
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.appbuscaviacep.api.InterfaceEndereco
 import com.example.appbuscaviacep.api.RetrofitHelper
 import com.example.appbuscaviacep.api.model.Endereco
+import com.example.appbuscaviacep.database.DadosCepDAO
+import com.example.appbuscaviacep.database.DataBaseHelper
+import com.example.appbuscaviacep.database.model.CepPesquisado
 import com.example.appbuscaviacep.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +28,19 @@ class MainActivity : AppCompatActivity() {
         RetrofitHelper.retrofit.create(InterfaceEndereco::class.java)
     }
 
+    private lateinit var cepPesquisadoAdapter: CepPesquisadoAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        cepPesquisadoAdapter = CepPesquisadoAdapter()
+        binding.rvCep.adapter = cepPesquisadoAdapter
+        binding.rvCep.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        val dadosCepDAO = DadosCepDAO(this)
+        val listaCepsPesquisadosAtualizada = dadosCepDAO.listar()
+        cepPesquisadoAdapter.salvarLista(listaCepsPesquisadosAtualizada)
+
 
         binding.buscarButton.setOnClickListener {
             limparCampos()
@@ -96,10 +111,46 @@ class MainActivity : AppCompatActivity() {
             bairroText.text = getString(R.string.bairro, verificarValor(endereco.bairro))
             cidadeText.text = getString(R.string.cidade, verificarValor(endereco.cidade))
             estadoText.text = getString(R.string.estado, verificarValor(endereco.estado))
+
+            val cepPesquisado = CepPesquisado(
+                cepInput.text.toString(),
+                endereco.logradouro,
+                endereco.bairro,
+                endereco.cidade,
+                endereco.estado
+            )
+
+            atualizarHistorico(cepPesquisado)
         }
     }
 
     private fun verificarValor(valor: String?): String {
         return if (valor.isNullOrBlank()) getString(R.string.invalido) else valor
+    }
+
+    private fun atualizarHistorico(cepPesquisado: CepPesquisado) {
+
+        val dadosCepDAO = DadosCepDAO(this@MainActivity)
+        val listaCepsPesquisados = dadosCepDAO.listar()
+
+        if(listaCepsPesquisados.size == 10){
+            listaCepsPesquisados.removeAt(9)
+            listarCeps(listaCepsPesquisados, cepPesquisado, dadosCepDAO)
+        } else {
+            listarCeps(listaCepsPesquisados, cepPesquisado, dadosCepDAO)
+        }
+
+    }
+
+    private fun listarCeps(listaCepsPesquisados: MutableList<CepPesquisado>, cepPesquisado: CepPesquisado, dadosCepDAO: DadosCepDAO) {
+
+        listaCepsPesquisados.add(0, cepPesquisado)
+        dadosCepDAO.limparTabela()
+
+        listaCepsPesquisados.forEach { pesquisa ->
+            dadosCepDAO.salvar(pesquisa)
+        }
+        val listaCepsPesquisadosAtualizada = dadosCepDAO.listar()
+        cepPesquisadoAdapter.salvarLista(listaCepsPesquisadosAtualizada)
     }
 }
